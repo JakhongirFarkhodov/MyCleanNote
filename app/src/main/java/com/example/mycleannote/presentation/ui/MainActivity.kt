@@ -14,23 +14,31 @@ import com.example.mycleannote.presentation.adapter.ShopItemAdapter
 import com.example.mycleannote.presentation.adapter.ShopItemAdapter.Companion.VIEW_ITEM_DISABLED
 import com.example.mycleannote.presentation.adapter.ShopItemAdapter.Companion.VIEW_ITEM_ENABLED
 import com.example.mycleannote.presentation.viewmodel.main.MainViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var shopAdapter: ShopItemAdapter
+    private lateinit var floatingActionButton: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.rv_shop_list)
+        floatingActionButton = findViewById(R.id.button_add_shop_item)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         shopAdapter = ShopItemAdapter()
 
         viewModel.shopList.observe(this) {
             shopAdapter.submitList(it)
+        }
+
+        floatingActionButton.setOnClickListener {
+            val intent = ShopItemActivity.newIntentAdd(this)
+            startActivity(intent)
         }
 
 
@@ -71,7 +79,8 @@ class MainActivity : AppCompatActivity() {
         with(shopAdapter)
         {
             onItemClickListener = {
-                Toast.makeText(this@MainActivity, "${it.name}", Toast.LENGTH_SHORT).show()
+                val intent = ShopItemActivity.newIntentEdit(this@MainActivity, it.id)
+                startActivity(intent)
             }
 
             onItemLongClickListener = {
