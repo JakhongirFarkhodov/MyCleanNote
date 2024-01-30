@@ -3,32 +3,81 @@ package com.example.mycleannote.presentation.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.LEFT
+import androidx.recyclerview.widget.ItemTouchHelper.RIGHT
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mycleannote.R
+import com.example.mycleannote.presentation.adapter.ShopItemAdapter
+import com.example.mycleannote.presentation.adapter.ShopItemAdapter.Companion.VIEW_ITEM_DISABLED
+import com.example.mycleannote.presentation.adapter.ShopItemAdapter.Companion.VIEW_ITEM_ENABLED
 import com.example.mycleannote.presentation.viewmodel.main.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var shopAdapter: ShopItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        recyclerView = findViewById(R.id.rv_shop_list)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        shopAdapter = ShopItemAdapter()
 
-        var isEnabled = true
-
-        viewModel.shopList.observe(this){
-            Log.d("TAG", "onCreate: ${it}")
-            if (isEnabled)
-            {
-                val item = it[1].copy(isEnabled = !it[1].isEnabled)
-                viewModel.editShopItem(item)
-                isEnabled = false
-            }
+        viewModel.shopList.observe(this) {
+            shopAdapter.submitList(it)
         }
 
 
+        with(recyclerView) {
+            adapter = shopAdapter
+            recycledViewPool.setMaxRecycledViews(VIEW_ITEM_ENABLED, 30)
+            recycledViewPool.setMaxRecycledViews(VIEW_ITEM_DISABLED, 30)
+        }
+
+        onShopItemClickListener(shopAdapter)
+        onShopItemCallBack(recyclerView)
+
+
+    }
+
+    private fun onShopItemCallBack(recyclerView: RecyclerView) {
+        val callback = object : ItemTouchHelper.SimpleCallback(0, LEFT or RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val item = shopAdapter.currentList[viewHolder.adapterPosition]
+                viewModel.deleteShopItem(item)
+            }
+
+        }
+
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    private fun onShopItemClickListener(shopAdapter: ShopItemAdapter) {
+        with(shopAdapter)
+        {
+            onItemClickListener = {
+                Toast.makeText(this@MainActivity, "${it.name}", Toast.LENGTH_SHORT).show()
+            }
+
+            onItemLongClickListener = {
+                val item = it.copy(isEnabled = !it.isEnabled)
+                viewModel.editShopItem(item)
+            }
+        }
     }
 }
