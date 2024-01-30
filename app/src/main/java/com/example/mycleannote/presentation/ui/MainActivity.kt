@@ -1,7 +1,8 @@
-package com.example.mycleannote
+package com.example.mycleannote.presentation.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.mycleannote.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
