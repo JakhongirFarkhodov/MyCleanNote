@@ -20,7 +20,7 @@ import com.example.mycleannote.presentation.adapter.ShopItemAdapter.Companion.VI
 import com.example.mycleannote.presentation.viewmodel.main.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnFinishClickListener {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var recyclerView: RecyclerView
@@ -122,8 +122,12 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
-        fragmentManager.popBackStack()
+        fragmentManager.popBackStack(null, 1)
         return super.getOnBackInvokedDispatcher()
+    }
+
+    override fun onFinish() {
+        fragmentManager.popBackStack()
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.mycleannote.presentation.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +26,19 @@ class ShopItemFragment : Fragment() {
     private lateinit var viewModel: ShopItemViewModel
     private var screen_mode = SCREEN_MODE
     private var shopItemId = ShopItem.UNDEFINED_ID
+    private lateinit var onFinishClickListener: OnFinishClickListener
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if (context is OnFinishClickListener)
+        {
+            onFinishClickListener = context
+        }
+        else{
+            throw RuntimeException("Activity ${context} should implement OnFinishClickListener")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +117,7 @@ class ShopItemFragment : Fragment() {
         }
 
         viewModel.shouldCloseActivity.observe(viewLifecycleOwner){
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            onFinishClickListener.onFinish()
         }
     }
 
@@ -212,4 +226,8 @@ class ShopItemFragment : Fragment() {
 
     }
 
+
+    interface OnFinishClickListener{
+        fun onFinish()
+    }
 }

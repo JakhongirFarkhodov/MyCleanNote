@@ -7,7 +7,7 @@ import android.os.Bundle
 import com.example.mycleannote.R
 import com.example.mycleannote.domain.model.main.ShopItem.Companion.UNDEFINED_ID
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnFinishClickListener {
 
     private var screen_mode = EXTRA_SCREEN_MODE_VALUE
     private var shopItemId = UNDEFINED_ID
@@ -85,5 +85,9 @@ class ShopItemActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun onFinish() {
+        finish()
     }
 }
