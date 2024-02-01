@@ -1,9 +1,11 @@
 package com.example.mycleannote.presentation.ui
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.LEFT
@@ -22,11 +24,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var shopAdapter: ShopItemAdapter
     private lateinit var floatingActionButton: FloatingActionButton
+    private var fragmentContainerView: FragmentContainerView? = null
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        fragmentContainerView = findViewById(R.id.main_fragment_container_view)
         recyclerView = findViewById(R.id.rv_shop_list)
         floatingActionButton = findViewById(R.id.button_add_shop_item)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -37,8 +42,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         floatingActionButton.setOnClickListener {
-            val intent = ShopItemActivity.newIntentAdd(this)
-            startActivity(intent)
+
+            if (fragmentContainerView == null) {
+                val intent = ShopItemActivity.newIntentAdd(this)
+                startActivity(intent)
+            }
+            else{
+                val fragment = ShopItemFragment.newFragmentAdd()
+                supportFragmentManager.beginTransaction().replace(R.id.main_fragment_container_view, fragment).commit()
+            }
         }
 
 
@@ -79,8 +91,15 @@ class MainActivity : AppCompatActivity() {
         with(shopAdapter)
         {
             onItemClickListener = {
-                val intent = ShopItemActivity.newIntentEdit(this@MainActivity, it.id)
-                startActivity(intent)
+                if (fragmentContainerView == null) {
+                    val intent = ShopItemActivity.newIntentEdit(this@MainActivity, it.id)
+                    startActivity(intent)
+                }
+                else{
+                    val fragment = ShopItemFragment.newFragmentEdit(it.id)
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_fragment_container_view, fragment).commit()
+                }
             }
 
             onItemLongClickListener = {
