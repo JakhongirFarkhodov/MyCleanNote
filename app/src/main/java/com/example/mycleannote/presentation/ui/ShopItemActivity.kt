@@ -31,7 +31,7 @@ class ShopItemActivity : AppCompatActivity() {
             }
         }
 
-        supportFragmentManager.beginTransaction().add(R.id.fragment_container_view, fragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment).commit()
 
 
     }

@@ -103,7 +103,7 @@ class ShopItemFragment : Fragment() {
         }
 
         viewModel.shouldCloseActivity.observe(viewLifecycleOwner){
-            requireActivity().finish()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 

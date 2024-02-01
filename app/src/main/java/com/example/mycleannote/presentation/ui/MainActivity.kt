@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
 import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.LEFT
@@ -25,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shopAdapter: ShopItemAdapter
     private lateinit var floatingActionButton: FloatingActionButton
     private var fragmentContainerView: FragmentContainerView? = null
+    private lateinit var fragmentManager: FragmentManager
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         fragmentContainerView = findViewById(R.id.main_fragment_container_view)
+        fragmentManager = supportFragmentManager
         recyclerView = findViewById(R.id.rv_shop_list)
         floatingActionButton = findViewById(R.id.button_add_shop_item)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
@@ -49,7 +53,8 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 val fragment = ShopItemFragment.newFragmentAdd()
-                supportFragmentManager.beginTransaction().replace(R.id.main_fragment_container_view, fragment).commit()
+
+                changeFragment(fragment)
             }
         }
 
@@ -64,6 +69,13 @@ class MainActivity : AppCompatActivity() {
         onShopItemCallBack(recyclerView)
 
 
+    }
+
+    private fun changeFragment(fragment: ShopItemFragment) {
+        fragmentManager.beginTransaction()
+            .replace(R.id.main_fragment_container_view, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun onShopItemCallBack(recyclerView: RecyclerView) {
@@ -97,8 +109,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else{
                     val fragment = ShopItemFragment.newFragmentEdit(it.id)
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fragment_container_view, fragment).commit()
+                    changeFragment(fragment)
                 }
             }
 
@@ -108,4 +119,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    override fun getOnBackInvokedDispatcher(): OnBackInvokedDispatcher {
+        fragmentManager.popBackStack()
+        return super.getOnBackInvokedDispatcher()
+    }
 }
+
